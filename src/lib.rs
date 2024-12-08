@@ -56,6 +56,7 @@ pub fn init_clogger(log_file_path: &str) {
 /// 用于输出和记录常规日志。
 ///
 /// 该宏会将日志信息输出到终端并写入日志文件，日志的级别为 `Info`。可以通过 `$moudle` 参数指定模块名称。
+/// 若未指定 `$module` 参数，将使用 `module_path!()` 自动获取模块名称。
 ///
 /// # 示例
 /// ```rust
@@ -64,18 +65,25 @@ pub fn init_clogger(log_file_path: &str) {
 /// // 初始化 CLogger
 /// init_clogger("/tmp/clogger_example.log");
 /// // 输出日志
-/// c_log!("example::moudle_name()", "这是一条常规日志！(づ｡◕‿‿◕｡)づ");
+/// c_log!("example::moudle_name", "这是一条常规日志！(づ｡◕‿‿◕｡)づ");
 /// ```
 ///
 /// # 参数
-/// - `$module`: 模块名称（用于在日志中标记日志来源）。
+/// - `$module` (可选): 模块名称。
 /// - `$message`: 日志信息内容。
 #[macro_export]
 macro_rules! c_log {
+    ($message:expr) => {
+        {
+            c_log!(module_path!(), $message);
+        }
+    };
     ($module:expr, $message:expr) => {
         {
             use log::info;
-            info!(target: $module, "{}", $message);
+            use std::panic::Location;
+            let location = Location::caller();
+            info!(target: format!("{} ({}:{}^{})", $module, location.file(), location.line(), location.column()).as_str(), "{}", $message);
         }
     };
 }
@@ -83,6 +91,7 @@ macro_rules! c_log {
 /// 用于输出和记录警告日志。
 ///
 /// 该宏会将日志信息输出到终端并写入日志文件，日志的级别为 `Warn`。可以通过 `$moudle` 参数指定模块名称。
+/// 若未指定 `$module` 参数，将使用 `module_path!()` 自动获取模块名称。
 ///
 /// # 示例
 /// ```rust
@@ -91,19 +100,26 @@ macro_rules! c_log {
 /// // 初始化 CLogger
 /// init_clogger("/tmp/clogger_example.log");
 /// // 输出日志
-/// c_warn!("example::moudle_name()", "这是一条警告日志！w(ﾟДﾟ)w");
+/// c_warn!("example::moudle_name", "这是一条警告日志！w(ﾟДﾟ)w");
 /// ```
 ///
 /// # 参数
-/// - `$module`: 模块名称（用于在日志中标记日志来源）。
+/// - `$module` (可选): 模块名称。
 /// - `$message`: 日志信息内容。
 #[macro_export]
 macro_rules! c_warn {
+    ($message:expr) => {
+        {
+            c_warn!(module_path!(), $message);
+        }
+    };
     ($module:expr, $message:expr) => {
         {
             use log::warn;
             use colored::Colorize;
-            warn!(target: $module, "{}", $message.yellow());
+            use std::panic::Location;
+            let location = Location::caller();
+            warn!(target: format!("{} ({}:{}^{})", $module, location.file(), location.line(), location.column()).as_str(), "{}", $message.yellow());
         }
     };
 }
@@ -111,6 +127,7 @@ macro_rules! c_warn {
 /// 用于输出和记录错误日志。
 ///
 /// 该宏会将日志信息输出到终端并写入日志文件，日志的级别为 `Error`。可以通过 `$moudle` 参数指定模块名称。
+/// 若未指定 `$module` 参数，将使用 `module_path!()` 自动获取模块名称。
 ///
 /// # 示例
 /// ```rust
@@ -119,19 +136,26 @@ macro_rules! c_warn {
 /// // 初始化 CLogger
 /// init_clogger("/tmp/clogger_example.log");
 /// // 输出日志
-/// c_error!("example::moudle_name()", "这是一条错误日志！＞﹏＜");
+/// c_error!("example::moudle_name", "这是一条错误日志！＞﹏＜");
 /// ```
 ///
 /// # 参数
-/// - `$module`: 模块名称（用于在日志中标记日志来源）。
+/// - `$module` (可选): 模块名称。
 /// - `$message`: 日志信息内容。
 #[macro_export]
 macro_rules! c_error {
+    ($message:expr) => {
+        {
+            c_error!(module_path!(), $message);
+        }
+    };
     ($module:expr, $message:expr) => {
         {
             use log::error;
             use colored::Colorize;
-            error!(target: $module, "{}", $message.red());
+            use std::panic::Location;
+            let location = Location::caller();
+            error!(target: format!("{} ({}:{}^{})", $module, location.file(), location.line(), location.column()).as_str(), "{}", $message.red());
         }
     };
 }
@@ -139,6 +163,7 @@ macro_rules! c_error {
 /// 用于输出和记录调试日志。
 ///
 /// 该宏会将日志信息输出到终端并写入日志文件，日志的级别为 `Debug`。可以通过 `$moudle` 参数指定模块名称。
+/// 若未指定 `$module` 参数，将使用 `module_path!()` 自动获取模块名称。
 ///
 /// # 示例
 /// ```rust
@@ -147,18 +172,25 @@ macro_rules! c_error {
 /// // 初始化 CLogger
 /// init_clogger("/tmp/clogger_example.log");
 /// // 输出日志
-/// c_debug!("example::moudle_name()", "这是一条调试输出！(ง •_•)ง");
+/// c_debug!("example::moudle_name", "这是一条调试输出！(ง •_•)ง");
 /// ```
 ///
 /// # 参数
-/// - `$module`: 模块名称（用于在日志中标记日志来源）。
+/// - `$module` (可选): 模块名称（用于在日志中标记日志来源）。
 /// - `$message`: 日志信息内容。
 #[macro_export]
 macro_rules! c_debug {
+    ($message:expr) => {
+        {
+            c_debug!(module_path!(), $message);
+        }
+    };
     ($module:expr, $message:expr) => {
         {
             use log::debug;
-            debug!(target: $module, "{}", $message);
+            use std::panic::Location;
+            let location = Location::caller();
+            debug!(target: format!("{} ({}:{}^{})", $module, location.file(), location.line(), location.column()).as_str(), "{}", $message);
         }
     };
 }
@@ -175,12 +207,19 @@ mod tests {
 
         let x = 42;
 
-        c_log!("tests::test_logging()", "这是一条常规日志！(づ｡◕‿‿◕｡)づ");
-        c_warn!("tests::test_logging()", "这是一条警告日志！w(ﾟДﾟ)w");
-        c_error!("tests::test_logging()", "这是一条错误日志！＞﹏＜");
-        c_debug!("tests::test_logging()", "这是一条调试输出！(ง •_•)ง");
+        c_log!(
+            "clogger::tests::test_logging",
+            "这是一条常规日志！(づ｡◕‿‿◕｡)づ"
+        );
+        c_log!("这也是一条常规日志！(づ｡◕‿‿◕｡)づ");
+        c_warn!("clogger::tests::test_logging", "这是一条警告日志！w(ﾟДﾟ)w");
+        c_warn!("这也是一条警告日志！w(ﾟДﾟ)w");
+        c_error!("clogger::tests::test_logging", "这是一条错误日志！＞﹏＜");
+        c_error!("这也是一条错误日志！＞﹏＜");
+        c_debug!("clogger::tests::test_logging", "这是一条调试输出！(ง •_•)ง");
+        c_debug!("这也是一条调试输出！(ง •_•)ง");
         c_debug!(
-            "tests::test_logging()",
+            "clogger::tests::test_logging()",
             format!("(format! Test) 变量 x 的内容为: {}", x)
         );
     }
