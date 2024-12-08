@@ -50,6 +50,7 @@ pub fn init_clogger(log_file_path: &str) {
             .chain(fern::log_file(log_file_path).unwrap()); // 写入日志文件
 
         base_config.apply().unwrap();
+        c_log!("CLogger 初始化完成 (ง •_•)ง");
     });
 }
 
