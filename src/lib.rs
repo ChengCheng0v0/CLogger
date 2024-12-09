@@ -84,7 +84,7 @@ macro_rules! c_log {
             use log::info;
             use std::panic::Location;
             let location = Location::caller();
-            info!(target: format!("{} ({}:{}^{})", $module, location.file(), location.line(), location.column()).as_str(), "{}", $message);
+            info!(target: format!("{} ({}:{})", $module, location.file(), location.line()).as_str(), "{}", $message);
         }
     };
 }
